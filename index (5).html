@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUMO Chacarita // Recovery Mode</title>
+    <style>
+        :root {
+            --bg-dark: #0D1117;
+            --panel-bg: #161B22;
+            --neon-green: #a4e320;
+            --neon-glow: rgba(164, 227, 32, 0.35);
+            --text-main: #c9d1d9;
+            --text-bright: #ffffff;
+            --border-color: #30363d;
+            --alert-red: #ff5555;
+            --purple-accent: #6e40c9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 20px;
+            max-width: 920px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tumo-badge {
+            background-color: var(--neon-green);
+            color: #000;
+            padding: 6px 12px;
+            font-weight: 900;
+            font-size: 1.3rem;
+            border-radius: 6px;
+            box-shadow: 0 0 14px var(--neon-glow);
+            letter-spacing: 1px;
+        }
+
+        .header-title {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .team-badge {
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background: rgba(164, 227, 32, 0.05);
+        }
+
+        .dev-skip {
+            background: #21262d;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            transition: all 0.25s ease;
+        }
+
+        .dev-skip:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 12px var(--neon-glow);
+            transform: scale(1.05);
+        }
+
+        /* Mascot Briefing Card */
+        .mascot-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 22px;
+            display: flex;
+            gap: 24px;
+            margin-bottom: 24px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .mascot-avatar-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #090d12;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(164, 227, 32, 0.15);
+        }
+
+        .staff-badge {
+            position: absolute;
+            bottom: -10px;
+            background-color: var(--neon-green);
+            color: #000;
+            font-size: 0.72rem;
+            font-weight: 900;
+            padding: 3px 12px;
+            border-radius: 12px;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+        }
+
+        .mascot-dialogue-box {
+            flex-grow: 1;
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            color: var(--neon-green);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .mascot-dialogue-box strong {
+            color: #fff;
+            background: rgba(164, 227, 32, 0.18);
+            padding: 1px 5px;
+            border-radius: 3px;
+        }
+
+        /* Module Cards */
+        .module-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--neon-green);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(164, 227, 32, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .module-card.locked {
+            border-color: var(--border-color);
+            opacity: 0.45;
+            pointer-events: none;
+            box-shadow: none;
+        }
+
+        .module-card.completed {
+            border-color: var(--border-color);
+            box-shadow: none;
+        }
+
+        .module-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--text-bright);
+        }
+
+        .art-badge-btn {
+            background-color: #271c3a;
+            border: 1px solid var(--purple-accent);
+            border-radius: 8px;
+            width: 46px;
+            height: 46px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .art-badge-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 12px rgba(110, 64, 201, 0.5);
+        }
+
+        .module-status {
+            font-size: 0.9rem;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .status-label { color: var(--text-main); }
+        .status-error { color: var(--alert-red); font-weight: bold; }
+        .status-ok { color: var(--neon-green); font-weight: bold; }
+
+        .question-text {
+            color: var(--neon-green);
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+        }
+
+        /* Compact Canvas for Module 1 */
+        .canvas-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .compact-canvas {
+            width: 100%;
+            max-width: 400px;
+            height: 200px;
+            background-color: #090d12;
+            border: 1px dashed var(--neon-green);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        .distractor-emoji {
+            position: absolute;
+            font-size: 1.4rem;
+            user-select: none;
+            opacity: 0.45;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .target-tool-emoji {
+            position: absolute;
+            font-size: 2.1rem;
+            cursor: pointer;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            animation: subtlePulse 2s infinite ease-in-out;
+            transition: transform 0.2s;
+        }
+
+        .target-tool-emoji:hover {
+            transform: translate(-50%, -50%) scale(1.25);
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% { filter: drop-shadow(0 0 3px rgba(164, 227, 32, 0.4)); }
+            50% { filter: drop-shadow(0 0 12px rgba(164, 227, 32, 0.95)); }
+        }
+
+        /* Input & Buttons */
+        .input-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            color: var(--text-bright);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--neon-green);
+        }
+
+        button.btn-submit {
+            background-color: var(--neon-green);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        button.btn-submit:hover {
+            background-color: #b5f230;
+            box-shadow: 0 0 12px var(--neon-glow);
+        }
+
+        .feedback-msg {
+            margin-top: 10px;
+            font-size: 0.88rem;
+            min-height: 20px;
+        }
+
+        .feedback-error { color: var(--alert-red); }
+        .feedback-success { color: var(--neon-green); }
+
+        /* Module 2: Arcade Bug Hunter */
+        .arcade-container {
+            margin-top: 12px;
+        }
+
+        .arcade-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #090d12;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            padding: 10px 16px;
+            border-radius: 8px 8px 0 0;
+            font-size: 0.9rem;
+        }
+
+        .bug-counter {
+            color: var(--neon-green);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .arcade-screen {
+            width: 100%;
+            height: 280px;
+            background-color: #05070a;
+            border: 1px solid var(--neon-green);
+            border-radius: 0 0 8px 8px;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .bug-entity {
+            position: absolute;
+            font-size: 1.9rem;
+            user-select: none;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s;
+            z-index: 5;
+        }
+
+        .bug-entity:active {
+            transform: translate(-50%, -50%) scale(0.7);
+        }
+
+        .victory-banner {
+            margin-top: 18px;
+            background: rgba(164, 227, 32, 0.1);
+            border: 1px solid var(--neon-green);
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+            color: var(--text-bright);
+        }
+
+        .password-code {
+            display: inline-block;
+            margin-top: 8px;
+            background-color: #090d12;
+            border: 1px dashed var(--neon-green);
+            color: var(--neon-green);
+            font-size: 1.35rem;
+            font-weight: 900;
+            padding: 8px 20px;
+            border-radius: 6px;
+            letter-spacing: 2px;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .mascot-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <div class="tumo-badge">TUMO</div>
+            <div class="header-title">CHACARITA // RECOVERY MODE</div>
+        </div>
+        <div class="header-right">
+            <div class="team-badge">EQUIPO: HACKERS</div>
+            <button class="dev-skip" onclick="devSkip()" title="Dev Skip: Saltar al Módulo 2">🔓</button>
+        </div>
+    </header>
+
+    <!-- Mascot Briefing -->
+    <div class="mascot-container">
+        <div class="mascot-avatar-wrapper">
+            <!-- Custom SVG Staff Dog -->
+            <svg width="74" height="74" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ears -->
+                <ellipse cx="26" cy="42" rx="10" ry="18" fill="#8B4513" transform="rotate(15 26 42)"/>
+                <ellipse cx="74" cy="42" rx="10" ry="18" fill="#8B4513" transform="rotate(-15 74 42)"/>
+                <!-- Tail -->
+                <path d="M 68 78 Q 85 70 82 58" stroke="#D2691E" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <!-- TUMO Green Shirt -->
+                <path d="M 32 62 L 68 62 L 73 88 L 27 88 Z" fill="#a4e320"/>
+                <rect x="41" y="70" width="18" height="8" rx="2" fill="#0D1117"/>
+                <text x="50" y="76" font-family="monospace" font-size="5.5" font-weight="bold" fill="#a4e320" text-anchor="middle">TUMO</text>
+                <!-- Head -->
+                <circle cx="50" cy="42" r="22" fill="#D2691E"/>
+                <!-- Snout -->
+                <ellipse cx="50" cy="48" rx="11" ry="8" fill="#F5DEB3"/>
+                <!-- Eyes -->
+                <circle cx="42" cy="38" r="3" fill="#0D1117"/>
+                <circle cx="58" cy="38" r="3" fill="#0D1117"/>
+                <circle cx="43" cy="37" r="1" fill="#ffffff"/>
+                <circle cx="59" cy="37" r="1" fill="#ffffff"/>
+                <!-- Nose -->
+                <ellipse cx="50" cy="45" rx="4" ry="2.8" fill="#0D1117"/>
+            </svg>
+            <div class="staff-badge">STAFF</div>
+        </div>
+        <div class="mascot-dialogue-box" id="mascot-text">
+            > <strong>ENLACE ESTABLECIDO, HACKERS.</strong> ¡Qué alivio verlos! Soy el perro guardián del sistema de TUMO.<br><br>
+            Un glitch masivo corrompió los servidores. En el módulo de Dibujo Digital se mezcló chatarra espacial: exploren el recuadro y <strong>encuentren una herramienta oculta para crear arte</strong> para restaurar el sistema.
+        </div>
+    </div>
+
+    <!-- Module 1: Digital Drawing -->
+    <div class="module-card" id="module-1">
+        <div class="module-top-row">
+            <div class="module-header">🎨 Módulo 1: Dibujo Digital</div>
+            <div class="art-badge-btn" onclick="regenerateCanvas()" title="Reescanear sector">🧑‍🎨</div>
+        </div>
+        
+        <div class="module-status">
+            <span class="status-label">Estado: </span>
+            <span class="status-error" id="mod1-status">Archivos corrompidos</span>
+        </div>
+
+        <div class="canvas-wrapper">
+            <div class="question-text">Sector de recuperación de archivos:</div>
+            <div class="compact-canvas" id="drawing-canvas"></div>
+        </div>
+
+        <div class="question-text">¿Qué objeto lograste recuperar del lienzo?</div>
+        <div class="input-row">
+            <input type="text" id="art-input" placeholder="Escribe el objeto que encontraste..." autocomplete="off">
+            <button class="btn-submit" id="btn-mod1" onclick="validateModule1()">ENVIAR</button>
+        </div>
+        <div class="feedback-msg" id="mod1-feedback"></div>
+    </div>
+
+    <!-- Module 2: Video Games -->
+    <div class="module-card locked" id="module-2">
+        <div class="module-top-row">
+            <div class="module-header">🎮 Módulo 2: Videojuegos</div>
+        </div>
+
+        <div class="module-status">
+            <span class="status-label">Estado: </span>
+            <span class="status-error" id="mod2-status">Bloqueado — Esperando Módulo 1</span>
+        </div>
+
+        <div class="arcade-container hidden" id="arcade-container">
+            <div class="arcade-hud">
+                <span>TERMINAL ARCADE // PURGA DE SISTEMA</span>
+                <span class="bug-counter">BUGS ATRAPADOS: <span id="bug-count">0</span> / 13</span>
+            </div>
+            <div class="arcade-screen" id="arcade-screen"></div>
+        </div>
+
+        <div class="victory-banner hidden" id="victory-banner">
+            <div>¡TODOS LOS BUGS ELIMINADOS! EL NÚCLEO DE TUMO ESTÁ A SALVO.</div>
+            <div style="margin-top: 8px; font-size: 0.9rem; color: var(--text-main);">Contraseña de acceso desbloqueada:</div>
+            <div class="password-code">DEBUG-TUMO</div>
+        </div>
+    </div>
+
+    <script>
+        // --- MODULE 1: COMPACT CANVAS SEARCH ---
+        function initModule1() {
+            const canvas = document.getElementById('drawing-canvas');
+            canvas.innerHTML = '';
+
+            const width = canvas.clientWidth || 400;
+            const height = canvas.clientHeight || 200;
+            const margin = 28;
+
+            const distractors = [
+                '👾', '💻', '🪐', '🍕', '🚀', '⭐', '⚡', '🤖',
+                '🎧', '🔋', '⚙️', '🧊', '📱', '💿', '🛸', '🛰️', '🔧'
+            ];
+
+            // Spawn 16 distractors strictly within bounds
+            for (let i = 0; i < 16; i++) {
+                const el = document.createElement('div');
+                el.className = 'distractor-emoji';
+                el.textContent = distractors[i % distractors.length];
+                el.style.left = (Math.random() * (width - margin * 2) + margin) + 'px';
+                el.style.top = (Math.random() * (height - margin * 2) + margin) + 'px';
+                canvas.appendChild(el);
+            }
+
+            // Spawn 1 guaranteed art tool (palette) strictly within visible bounds
+            const target = document.createElement('div');
+            target.className = 'target-tool-emoji';
+            target.textContent = '🎨';
+            target.style.left = (Math.random() * (width - margin * 2) + margin) + 'px';
+            target.style.top = (Math.random() * (height - margin * 2) + margin) + 'px';
+
+            target.addEventListener('click', () => {
+                const input = document.getElementById('art-input');
+                if (!input.disabled) {
+                    input.value = 'paleta de pintura';
+                    validateModule1();
+                }
+            });
+
+            canvas.appendChild(target);
+        }
+
+        function regenerateCanvas() {
+            const input = document.getElementById('art-input');
+            if (!input.disabled) {
+                initModule1();
+            }
+        }
+
+        function validateModule1() {
+            const input = document.getElementById('art-input');
+            const feedback = document.getElementById('mod1-feedback');
+            const val = input.value.toLowerCase().trim();
+
+            const acceptedKeywords = [
+                'paleta', 'pincel', 'pintura', 'arte', 'dibujo', 'colores', 'acuarela'
+            ];
+
+            const isValid = acceptedKeywords.some(keyword => val.includes(keyword));
+
+            if (isValid) {
+                feedback.textContent = '> Herramienta verificada. Restaurando archivos...';
+                feedback.className = 'feedback-msg feedback-success';
+                unlockModule2();
+            } else {
+                feedback.textContent = '> Error: Ese objeto no corresponde a una herramienta de arte. Revisa el recuadro.';
+                feedback.className = 'feedback-msg feedback-error';
+            }
+        }
+
+        document.getElementById('art-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validateModule1();
+            }
+        });
+
+        // --- TRANSITION & MODULE 2: 13 BUG HUNTER ---
+        let bugs = [];
+        let bugsCaught = 0;
+        const TOTAL_BUGS = 13;
+        let animFrameId = null;
+
+        function unlockModule2() {
+            // Complete Module 1
+            const mod1 = document.getElementById('module-1');
+            mod1.classList.add('completed');
+            const mod1Status = document.getElementById('mod1-status');
+            mod1Status.textContent = 'Archivos restaurados (100%)';
+            mod1Status.className = 'status-ok';
+
+            document.getElementById('art-input').disabled = true;
+            document.getElementById('btn-mod1').disabled = true;
+            document.getElementById('drawing-canvas').style.opacity = '0.5';
+
+            // Update Mascot Dialogue
+            document.getElementById('mascot-text').innerHTML =
+                '> <strong>¡MÓDULO 1 RESTAURADO!</strong> Gran trabajo.<br><br>' +
+                'Pero alerta máxima: <strong>13 bugs veloces (👾)</strong> invadieron la terminal de <strong>Videojuegos</strong>. ' +
+                'Hagan clic sobre todos ellos antes de que colapsen el servidor para obtener la clave final.';
+
+            // Activate Module 2
+            const mod2 = document.getElementById('module-2');
+            mod2.classList.remove('locked');
+            const mod2Status = document.getElementById('mod2-status');
+            mod2Status.textContent = 'Infección detectada — Purga requerida';
+            mod2Status.className = 'status-error';
+
+            document.getElementById('arcade-container').classList.remove('hidden');
+            startArcadeGame();
+        }
+
+        function devSkip() {
+            const input = document.getElementById('art-input');
+            if (!input.disabled) {
+                input.value = 'paleta';
+            }
+            unlockModule2();
+        }
+
+        function startArcadeGame() {
+            const screen = document.getElementById('arcade-screen');
+            screen.innerHTML = '';
+            bugs = [];
+            bugsCaught = 0;
+            document.getElementById('bug-count').textContent = '0';
+            document.getElementById('victory-banner').classList.add('hidden');
+
+            if (animFrameId) {
+                cancelAnimationFrame(animFrameId);
+            }
+
+            const width = screen.clientWidth || 800;
+            const height = screen.clientHeight || 280;
+
+            for (let i = 0; i < TOTAL_BUGS; i++) {
+                const el = document.createElement('div');
+                el.className = 'bug-entity';
+                el.textContent = '👾';
+
+                // Fast velocity
+                const speed = 3.2 + Math.random() * 2.5;
+                const angle = Math.random() * Math.PI * 2;
+
+                const bugObj = {
+                    el: el,
+                    x: Math.random() * (width - 60) + 30,
+                    y: Math.random() * (height - 60) + 30,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    active: true
+                };
+
+                el.style.left = bugObj.x + 'px';
+                el.style.top = bugObj.y + 'px';
+
+                el.addEventListener('pointerdown', (e) => {
+                    e.stopPropagation();
+                    catchBug(bugObj);
+                });
+
+                screen.appendChild(el);
+                bugs.push(bugObj);
+            }
+
+            updateBugs();
+        }
+
+        function catchBug(bugObj) {
+            if (!bugObj.active) return;
+            bugObj.active = false;
+            bugObj.el.style.display = 'none';
+            bugsCaught++;
+            document.getElementById('bug-count').textContent = bugsCaught;
+
+            if (bugsCaught >= TOTAL_BUGS) {
+                cancelAnimationFrame(animFrameId);
+                const mod2 = document.getElementById('module-2');
+                mod2.classList.add('completed');
+
+                const mod2Status = document.getElementById('mod2-status');
+                mod2Status.textContent = 'Sistema purgado y estable';
+                mod2Status.className = 'status-ok';
+
+                document.getElementById('arcade-container').classList.add('hidden');
+                document.getElementById('victory-banner').classList.remove('hidden');
+
+                document.getElementById('mascot-text').innerHTML =
+                    '> <strong>¡MISIÓN CUMPLIDA, HACKERS!</strong> Todos los servidores de TUMO Chacarita están operativos nuevamente. ' +
+                    'Usen la contraseña <strong>DEBUG-TUMO</strong> para completar su registro.';
+            }
+        }
+
+        function updateBugs() {
+            const screen = document.getElementById('arcade-screen');
+            const width = screen.clientWidth || 800;
+            const height = screen.clientHeight || 280;
+            const pad = 18;
+
+            for (let i = 0; i < bugs.length; i++) {
+                const b = bugs[i];
+                if (!b.active) continue;
+
+                b.x += b.vx;
+                b.y += b.vy;
+
+                if (b.x <= pad) {
+                    b.x = pad;
+                    b.vx *= -1;
+                } else if (b.x >= width - pad) {
+                    b.x = width - pad;
+                    b.vx *= -1;
+                }
+
+                if (b.y <= pad) {
+                    b.y = pad;
+                    b.vy *= -1;
+                } else if (b.y >= height - pad) {
+                    b.y = height - pad;
+                    b.vy *= -1;
+                }
+
+                b.el.style.left = b.x + 'px';
+                b.el.style.top = b.y + 'px';
+            }
+
+            if (bugsCaught < TOTAL_BUGS) {
+                animFrameId = requestAnimationFrame(updateBugs);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', initModule1);
+    </script>
+</body>
+</html>
